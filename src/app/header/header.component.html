@@ -1,1 +1,20 @@
-<p>header works!</p>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-sm">
+        <form>
+            <input class="form-control"
+            type="text"
+            placeholder="Enter a Country"
+            (blur)="hideDropdown()"
+            (input)="showDropdown(countryFilter)"
+            ngModel
+            name="countryFilter"
+            #countryFilter="ngModel">
+            <div class="autocomplete-listbox" *ngIf="displayDropdown && filteredOptions.length">
+                <ul class="dropdown-menu dropdown-menu-dark">
+                    <li *ngFor="let option of filteredOptions"><a class="dropdown-item" href="#">{{option}}</a></li>
+                </ul> 
+            </div>
+        </form>        
+    </div>
+    
+</nav>

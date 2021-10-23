@@ -1,0 +1,19 @@
+form, input {
+    width: 100%;
+}
+
+.autocomplete-listbox{
+    position: absolute;
+    right: auto;
+    top:100%;
+    margin-top: -0.5rem;
+}
+
+.autocomplete-listbox .dropdown-menu {
+    position: relative;
+    display: block;
+}
+
+.hidden {
+    display: none;
+}

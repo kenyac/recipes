@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgModel } from '@angular/forms';
 
 @Component({
   selector: 'app-header',
@@ -6,10 +7,32 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
+  options = ['One', 'Two', 'Three'];
+  filteredOptions: string[] = [];
+  displayDropdown = false;
 
   constructor() { }
 
-  ngOnInit(): void {
+  ngOnInit() {
+  }
+
+  hideDropdown() {
+    this.displayDropdown = false;
+  }
+
+  showDropdown(model: NgModel) {
+    if(model.viewModel !== ''){
+      this.displayDropdown = true;
+      this.filteredOptions = this.performFilter(model.viewModel);
+    } else {
+      this.hideDropdown();
+    }
+  }
+
+  performFilter(filterBy: string){
+    filterBy = filterBy.toLocaleLowerCase();
+    return this.options.filter((option: string) =>
+      option.toLocaleLowerCase().includes(filterBy));
   }
 
 }
