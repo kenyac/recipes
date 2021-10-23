@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { NgModel } from '@angular/forms';
 
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-  options = ['One', 'Two', 'Three'];
+  options = environment.countryArr;
   filteredOptions: string[] = [];
   displayDropdown = false;
 
@@ -29,7 +31,7 @@ export class HeaderComponent implements OnInit {
     }
   }
 
-  performFilter(filterBy: string){
+  performFilter(filterBy: string) {
     filterBy = filterBy.toLocaleLowerCase();
     return this.options.filter((option: string) =>
       option.toLocaleLowerCase().includes(filterBy));
