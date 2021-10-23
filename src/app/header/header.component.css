@@ -5,13 +5,17 @@ form, input {
 .autocomplete-listbox{
     position: absolute;
     right: auto;
+    display: flex;
     top:100%;
     margin-top: -0.5rem;
+    max-height: 250px;
+    overflow-y: auto;
 }
 
 .autocomplete-listbox .dropdown-menu {
     position: relative;
     display: block;
+    height: 100%;
 }
 
 .hidden {
