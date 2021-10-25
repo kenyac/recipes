@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgModel } from '@angular/forms';
+import { FormControl, FormGroup, NgModel, Validators } from '@angular/forms';
 
 import { environment } from 'src/environments/environment';
 
@@ -9,32 +9,41 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
+  form: FormGroup;
   options = environment.countryArr;
   filteredOptions: string[] = [];
   displayDropdown = false;
 
-  constructor() { }
+  constructor() { 
+    this.form = new FormGroup({
+    'countryName': new FormControl(null, {
+      validators: [Validators.required]
+    })
+  });}
 
   ngOnInit() {
+    this.form.valueChanges.subscribe(value => {
+      if (value.countryName !== ''){
+        this.displayDropdown = true;
+        this.filteredOptions = this.performFilter(value.countryName);
+      } else {
+        this.hideDropdown();
+      }
+    });
   }
 
   hideDropdown() {
     this.displayDropdown = false;
   }
 
-  showDropdown(model: NgModel) {
-    if(model.viewModel !== ''){
-      this.displayDropdown = true;
-      this.filteredOptions = this.performFilter(model.viewModel);
-    } else {
-      this.hideDropdown();
-    }
-  }
-
   performFilter(filterBy: string) {
     filterBy = filterBy.toLocaleLowerCase();
     return this.options.filter((option: string) =>
       option.toLocaleLowerCase().includes(filterBy));
+  }
+
+  selectCountry(event: any) {
+    this.form.controls.countryName.setValue(event.explicitOriginalTarget.innerHTML);
   }
 
 }

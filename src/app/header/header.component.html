@@ -1,17 +1,14 @@
 <nav class="navbar navbar-dark bg-dark">
     <div class="container-sm">
-        <form>
+        <form [formGroup]="form">
             <input class="form-control"
             type="text"
             placeholder="Enter a Country"
             (blur)="hideDropdown()"
-            (input)="showDropdown(countryFilter)"
-            ngModel
-            name="countryFilter"
-            #countryFilter="ngModel">
+            formControlName='countryName'>
             <div class="autocomplete-listbox" *ngIf="displayDropdown && filteredOptions.length">
                 <ul class="dropdown-menu dropdown-menu-dark">
-                    <li *ngFor="let option of filteredOptions"><a class="dropdown-item" href="#">{{option}}</a></li>
+                    <li *ngFor="let option of filteredOptions"><a class="dropdown-item" (mousedown)="selectCountry($event)">{{option}}</a></li>
                 </ul> 
             </div>
         </form>        
