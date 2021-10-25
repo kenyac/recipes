@@ -1,0 +1,26 @@
+.feature{
+  fill: #fff;
+  cursor: pointer;
+}
+
+.mesh {
+  fill: none;
+  stroke: #000;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.background {
+  fill: none;
+  pointer-events: all;
+}
+
+.feature.active {
+  fill: #66FCF1;
+}
+
+svg {
+    background-color: #0B0C10;
+}
+
+

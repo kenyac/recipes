@@ -23,7 +23,7 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {
     this.form.valueChanges.subscribe(value => {
-      if (value.countryName !== ''){
+      if (value.countryName !== '' && value.countryName !== undefined){
         this.displayDropdown = true;
         this.filteredOptions = this.performFilter(value.countryName);
       } else {
@@ -43,7 +43,8 @@ export class HeaderComponent implements OnInit {
   }
 
   selectCountry(event: any) {
-    this.form.controls.countryName.setValue(event.explicitOriginalTarget.innerHTML);
+    this.form.controls.countryName.setValue(event.originalTarget.innerHTML);
+    document.getElementById(event.originalTarget.innerHTML)?.dispatchEvent(new Event('click'));
   }
 
 }
