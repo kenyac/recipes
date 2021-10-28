@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, NgModel, Validators } from '@angular/forms';
-import { Subject } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
 
@@ -14,7 +13,6 @@ export class HeaderComponent implements OnInit {
   options = environment.countryArr;
   filteredOptions: string[] = [];
   displayDropdown = false;
-  private navSearchListener = new Subject<string>();
 
   constructor() { 
     this.form = new FormGroup({
@@ -32,10 +30,6 @@ export class HeaderComponent implements OnInit {
         this.hideDropdown();
       }
     });
-  }
-
-  getnavSearchListener() {
-    return this.navSearchListener.asObservable();
   }
 
   hideDropdown() {
