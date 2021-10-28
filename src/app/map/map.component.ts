@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
+import { HeaderService } from '../header/header.service';
 import { MapService } from './map.service';
 
 @Component({
@@ -10,12 +11,13 @@ import { MapService } from './map.service';
   encapsulation: ViewEncapsulation.None
 })
 export class MapComponent implements OnInit {
-  private countries: any;
   scaleFactor: number = 200;
+  private countries: any;
   static scrHeight: number = 0;
   static scrWidth: number = 0;
+  
 
-  constructor(private mapService: MapService) { 
+  constructor(private mapService: MapService, private headerService: HeaderService) { 
     this.getScreenSize();
   }
 
@@ -29,6 +31,7 @@ export class MapComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.headerService.updateNavSearchListener('North Korea');
     this.mapService.getMap().subscribe({
       next: data => {
         this.countries = data;
@@ -62,6 +65,7 @@ export class MapComponent implements OnInit {
       
         function clicked(this: any, d: any){
           if (active.node() === this) return reset();
+
           active.classed("active", false);
           active = d3.select(this).classed("active", true);
 

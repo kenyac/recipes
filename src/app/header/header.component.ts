@@ -1,20 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, NgModel, Validators } from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
+import { HeaderService } from './header.service';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   form: FormGroup;
   options = environment.countryArr;
   filteredOptions: string[] = [];
   displayDropdown = false;
+  private navSearchSub!: Subscription;
 
-  constructor() { 
+  constructor(private headerService: HeaderService) { 
     this.form = new FormGroup({
     'countryName': new FormControl(null, {
       validators: [Validators.required]
@@ -30,6 +33,11 @@ export class HeaderComponent implements OnInit {
         this.hideDropdown();
       }
     });
+    this.navSearchSub = this.headerService.getNavSearchListener().subscribe(
+      countryName => {
+        this.form.controls.countryName.setValue(countryName);
+      }
+    );
   }
 
   hideDropdown() {
@@ -47,4 +55,7 @@ export class HeaderComponent implements OnInit {
     document.getElementById(event.originalTarget.innerHTML)?.dispatchEvent(new Event('click'));
   }
 
+  ngOnDestroy() {
+    this.navSearchSub.unsubscribe();
+  }
 }
