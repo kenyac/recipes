@@ -34,6 +34,7 @@ export class MapComponent implements OnInit {
     this.headerService.updateNavSearchListener('North Korea');
     this.mapService.getMap().subscribe({
       next: data => {
+        console.log(data);
         this.countries = data;
         let projection: d3.GeoProjection = d3.geoMercator().translate([MapComponent.scrWidth / 2, MapComponent.scrHeight / 2]).scale(this.scaleFactor);
         
@@ -60,8 +61,10 @@ export class MapComponent implements OnInit {
           .on("click", reset);
 
         const path = d3.geoPath().projection(projection);
+        console.log(path);
 
         let mapFeatures : any = topojson.feature(this.countries, this.countries.objects.countries);
+        console.log(mapFeatures.features);
       
         function clicked(this: any, d: any){
           if (active.node() === this) return reset();
@@ -84,7 +87,8 @@ export class MapComponent implements OnInit {
         }
         let g = svg.append("g");
 
-
+        console.log(path(mapFeatures.features[0]));
+        
         g.selectAll("path")
             .data(mapFeatures.features)
             .enter().append("path")
