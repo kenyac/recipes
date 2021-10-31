@@ -1,5 +1,5 @@
-import { Country } from "./country.model";
-
-export interface Map {
-    countryName: Country;
+export interface MapModel {
+    id: number;
+    path: string | null;
+    active: boolean;
 }
