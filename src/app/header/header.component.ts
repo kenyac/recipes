@@ -36,6 +36,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.navSearchSub = this.headerService.getNavSearchListener().subscribe(
       countryName => {
         this.form.controls.countryName.setValue(countryName);
+        this.hideDropdown();
       }
     );
   }

@@ -3,167 +3,107 @@ import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
 import { HeaderService } from '../header/header.service';
 import { MapService } from './map.service';
-import { MapModel } from './map.model';
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
   scaleFactor: number = 200;
   activeCountry = '';
   //these will stay as any until I find the right typescript types that allow this code to work
-  svg: any;
-  path: any;
+  svg!: d3.Selection<SVGElement, unknown, HTMLElement, any>;
+  path!: d3.GeoPath<any, d3.GeoPermissibleObjects>;
+  transform: any;
   zoom: any;
+  mapFeatures: any = {};
+  mesh: any = {};
   private countries: any;
-  static scrHeight: number = 0;
-  static scrWidth: number = 0;
-  mapContainer = new Map();
+  scrHeight: number = 0;
+  scrWidth: number = 0;
+  svgDimensions: Record<string, string> = {}
   
 
   constructor(private mapService: MapService, private headerService: HeaderService) { 
     this.getScreenSize();
   }
 
+  setSVGDimensions(){
+    this.svgDimensions = {
+      'height': this.scrHeight.toString() + 'px',
+      'width': this.scrWidth.toString() + 'px'
+    };
+  }
+
   @HostListener('window:resize', ['event'])
   getScreenSize(_event?: undefined){
-    MapComponent.scrHeight = window.innerHeight - 54;
-    MapComponent.scrWidth = window.innerWidth;
+    this.scrHeight = window.innerHeight - 54;
+    this.scrWidth = window.innerWidth;
     if (window.innerWidth <= 460) {
       this.scaleFactor = 100;
     }
   }
 
   ngOnInit(): void {
-    this.headerService.updateNavSearchListener('North Korea');
+    this.setSVGDimensions();
     this.mapService.getMap().subscribe({
       next: data => {
-        console.log(data);
         this.countries = data;
-        let projection: d3.GeoProjection = d3.geoMercator().translate([MapComponent.scrWidth / 2, MapComponent.scrHeight / 2]).scale(this.scaleFactor);
-        
-        let active = d3.select(null);
-        
-        this.svg = d3.select<SVGElement, unknown>('.map-container').append('svg')
-          .attr('width', MapComponent.scrWidth)
-          .attr('height', MapComponent.scrHeight);
-
-/*        function reset() {
-          active.classed("active", false);
-          active = d3.select(null);
-        
-          svg.transition()
-              .duration(750)
-              // .call( zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1) ); // not in d3 v4
-              .call( zoom.transform, d3.zoomIdentity ); // updated for d3 v4
-        }
-*/
-          
-        this.svg.append("rect")
-          .attr("class", "background")
-          .attr("width", MapComponent.scrWidth)
-          .attr("height", MapComponent.scrHeight)
-          .on("click", this.reset.bind(this));
-
+        this.mesh = topojson.mesh(this.countries, this.countries.objects.countries, function(a, b) { return a !== b; });
+        let projection: d3.GeoProjection = d3.geoMercator().translate([this.scrWidth / 2, this.scrHeight / 2]).scale(this.scaleFactor);
+       
         this.path = d3.geoPath().projection(projection);
-        console.log(this.path);
 
-        let mapFeatures : any = topojson.feature(this.countries, this.countries.objects.countries);
-        console.log(mapFeatures.features);
-        for(let feature of mapFeatures.features){
-          let tempMap: MapModel = {id: feature.id,
-                                   path: this.path(feature),
-                                   active: false};
-          this.mapContainer.set(feature.properties.name, tempMap);
-        }
-        console.log(this.mapContainer);
-        console.log(this.mapContainer.get("Canada"));
-      
-/*        function clicked(this: any, d: any){
-          console.log(this);
-          if (active.node() === this) return reset();
-
-          active.classed("active", false);
-          active = d3.select(this).classed("active", true);
-
-          let bounds = path.bounds(d),
-          dx = bounds[1][0] - bounds[0][0],
-          dy = bounds[1][1] - bounds[0][1],
-          x = (bounds[0][0] + bounds[1][0]) / 2,
-          y = (bounds[0][1] + bounds[1][1]) / 2,
-          scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / MapComponent.scrWidth, dy / MapComponent.scrHeight))),
-          translate = [MapComponent.scrWidth / 2 - scale * x, MapComponent.scrHeight / 2 - scale * y];
-
-          svg.transition()
-              .duration(750)
-              // .call(zoom.translate(translate).scale(scale).event); // not in d3 v4
-              .call( zoom.transform, d3.zoomIdentity.translate(translate[0],translate[1]).scale(scale) );
-        }
-*/
-        let g = this.svg.append("g");
-
-        console.log(this.path(mapFeatures.features[0]));
-        
-        g.selectAll("path")
-            .data(mapFeatures.features)
-            .enter().append("path")
-            .attr("id", function(d: any) {return d.properties.name})
-            .attr("d", <d3.GeoPath<any,any>>this.path)
-            .attr("class", "feature ")
-            .on("click", this.clicked2.bind(this));
-
-        g.append("path")
-            .datum(topojson.mesh(this.countries, this.countries.objects.countries, function(a, b) { return a !== b; }))
-            .attr("class", "mesh")
-            .attr("d", <d3.GeoPath<any,any>>this.path);
-                
+        this.mapFeatures = topojson.feature(this.countries, this.countries.objects.countries);  
+        this.svg = d3.select<SVGElement, unknown>('.svgMapContainer');         
+        },
+      complete: () => {
         this.zoom = d3.zoom<SVGSVGElement, unknown>()
               .scaleExtent([1, 8])
-              .on('zoom', this.zoomed.bind(this));
-
-        
-
-        this.svg.call(this.zoom);
-
-        }      
+              .on('zoom', this.zoomed.bind(this)); 
+        this.svg.call(this.zoom);      
+      }      
     });
   }
+  zoomed(){
+    this.transform = d3.event.transform;
+    console.log(d3.event.transform.toString())
+  }
 
-  clicked2(featureObj: any){
-    console.log(featureObj)
-    this.mapContainer.get(featureObj.properties.name).active = true;
-    this.activeCountry = this.mapContainer.get(featureObj.properties.name);
-    console.log(this.mapContainer.get(featureObj.properties.name));
-    let bounds = this.path.bounds(featureObj),
+  reset() {
+    this.activeCountry = ''
+    this.svg.transition()
+    .duration(750)
+    // .call( zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1) ); // not in d3 v4
+    .call( this.zoom.transform, d3.zoomIdentity ); // updated for d3 v4
+  }
+
+  clicked(feature: any, event:any) {
+    event.stopPropagation();
+    if (this.activeCountry == feature.properties.name) { 
+      this.reset(); 
+      return 
+    }
+    this.activeCountry = feature.properties.name;
+    this.headerService.updateNavSearchListener(this.activeCountry);
+    let bounds = this.path.bounds(feature),
     dx = bounds[1][0] - bounds[0][0],
     dy = bounds[1][1] - bounds[0][1],
     x = (bounds[0][0] + bounds[1][0]) / 2,
     y = (bounds[0][1] + bounds[1][1]) / 2,
-    scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / MapComponent.scrWidth, dy / MapComponent.scrHeight))),
-    translate = [MapComponent.scrWidth / 2 - scale * x, MapComponent.scrHeight / 2 - scale * y];
+    scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / this.scrWidth, dy / this.scrHeight))),
+    translate = [this.scrWidth / 2 - scale * x, this.scrHeight / 2 - scale * y];
+
+    console.log(bounds);
 
     this.svg.transition()
         .duration(750)
         // .call(zoom.translate(translate).scale(scale).event); // not in d3 v4
         .call( this.zoom.transform as any, d3.zoomIdentity.translate(translate[0],translate[1]).scale(scale) );
   }
-
-  zoomToCountry(path: SVGPathElement){
-
-  }
-
-  zoomed(){
-    this.svg.selectAll('path')
-      .attr('transform', d3.event.transform);
-  }
-
-  reset() {
-    this.svg.transition()
-    .duration(750)
-    // .call( zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1) ); // not in d3 v4
-    .call( this.zoom.transform, d3.zoomIdentity ); // updated for d3 v4
+  
+  meshClick(event: any){
+    event.stopPropagation();
   }
 }

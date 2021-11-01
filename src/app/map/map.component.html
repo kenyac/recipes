@@ -1,1 +1,18 @@
-<div class="map-container"></div>
+<div class="map-container" *ngIf="mapFeatures !== {}">
+    <svg [ngStyle]="svgDimensions" class='svgMapContainer' (click)="reset()">
+        <g [attr.transform]="transform">
+            <path *ngFor="let feature of mapFeatures.features" 
+                  [id]="feature.properties.name" 
+                  class="feature"
+                  [ngClass]="feature.properties.name == activeCountry ? 'active': ''"
+                  [attr.d]="path(feature)"
+                  (click)="clicked(feature, $event)">
+            </path>
+            <path class="mesh"
+                  *ngIf="path !== undefined"
+                  [attr.d]="path(mesh)"
+                  (click)="meshClick($event)">
+            </path>
+        </g>
+    </svg>
+</div>
