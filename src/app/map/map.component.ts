@@ -23,6 +23,12 @@ export class MapComponent implements OnInit {
   scrHeight: number = 0;
   scrWidth: number = 0;
   svgDimensions: Record<string, string> = {}
+
+  xStart: number = 0;
+  xOffset: number = 0;
+  yStart: number = 0;
+  yOffset: number = 0;
+  draggable: boolean = false;
   
 
   constructor(private mapService: MapService, private headerService: HeaderService) { 
@@ -68,7 +74,7 @@ export class MapComponent implements OnInit {
   }
   zoomed(){
     this.transform = d3.event.transform;
-    console.log(d3.event.transform.toString())
+    console.log(d3.event)
   }
 
   reset() {
@@ -105,5 +111,29 @@ export class MapComponent implements OnInit {
   
   meshClick(event: any){
     event.stopPropagation();
+  }
+
+
+  mousedown(event: any) {
+    this.draggable = true;
+    console.log("mousedown");
+    this.xStart = event.clientX;
+    this.yStart = event.clientY;
+  }
+
+  mousemove(event: any) {
+    if (this.draggable) {
+      console.log(event.pageX, event.pageY);
+      this.xOffset += event.clientX - this.xStart;
+      this.xStart = event.clientX;
+      this.yOffset += event.clientY - this.yStart;
+      this.yStart = event.clientY;
+      this.transform = 'translate(' + this.xOffset.toString() + ', ' + this.yOffset.toString() + ')';
+    }
+  }
+
+  mouseup(event: any) {
+    this.draggable = false;
+    console.log("mouseup");
   }
 }
