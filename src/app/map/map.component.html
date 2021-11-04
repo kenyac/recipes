@@ -1,5 +1,5 @@
 <div class="map-container" *ngIf="mapFeatures !== {}">
-    <svg [ngStyle]="svgDimensions" class='svgMapContainer' (click)="reset()">
+    <svg [ngStyle]="svgDimensions" class='svgMapContainer' (click)="reset()" (mousedown)="mousedown($event)" (mousemove)="mousemove($event)" (mouseup)="mouseup($event)">
         <g [attr.transform]="transform">
             <path *ngFor="let feature of mapFeatures.features" 
                   [id]="feature.properties.name" 

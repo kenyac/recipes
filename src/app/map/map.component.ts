@@ -65,10 +65,10 @@ export class MapComponent implements OnInit {
         this.svg = d3.select<SVGElement, unknown>('.svgMapContainer');         
         },
       complete: () => {
-        this.zoom = d3.zoom<SVGSVGElement, unknown>()
+/*        this.zoom = d3.zoom<SVGSVGElement, unknown>()
               .scaleExtent([1, 8])
               .on('zoom', this.zoomed.bind(this)); 
-        this.svg.call(this.zoom);      
+        this.svg.call(this.zoom);      */
       }      
     });
   }
@@ -117,6 +117,7 @@ export class MapComponent implements OnInit {
   mousedown(event: any) {
     this.draggable = true;
     console.log("mousedown");
+    console.log(event.view);
     this.xStart = event.clientX;
     this.yStart = event.clientY;
   }
