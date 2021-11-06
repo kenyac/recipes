@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
 import { HeaderService } from '../header/header.service';
@@ -23,13 +23,17 @@ export class MapComponent implements OnInit {
   scrHeight: number = 0;
   scrWidth: number = 0;
   svgDimensions: Record<string, string> = {}
-
+/*
   xStart: number = 0;
   xOffset: number = 0;
   yStart: number = 0;
   yOffset: number = 0;
   draggable: boolean = false;
-  
+
+  start: DOMHighResTimeStamp = -1;
+  previousTimestamp: DOMHighResTimeStamp = -1
+  transformDest: any = {};
+  */
 
   constructor(private mapService: MapService, private headerService: HeaderService) { 
     this.getScreenSize();
@@ -49,7 +53,29 @@ export class MapComponent implements OnInit {
     if (window.innerWidth <= 460) {
       this.scaleFactor = 100;
     }
+    else if(window.innerWidth <= 900){
+      this.scaleFactor = 130;
+    }
   }
+
+  /*
+  @HostListener('window:mousemove', ['$event'])
+  mousemove(event: any){
+    if (this.draggable) {
+      this.xOffset += event.pageX - this.xStart;
+      this.xStart = event.pageX;
+      this.yOffset += event.pageY - this.yStart;
+      this.yStart = event.pageY;
+      this.transform = 'translate(' + this.xOffset.toString() + ', ' + this.yOffset.toString() + ')';
+    }
+  }
+
+  @HostListener('window:mouseup', ['$event'])
+  mouseup(event: undefined){
+    if (this.draggable) this.draggable = false;
+  }
+  */
+
 
   ngOnInit(): void {
     this.setSVGDimensions();
@@ -61,20 +87,21 @@ export class MapComponent implements OnInit {
        
         this.path = d3.geoPath().projection(projection);
 
-        this.mapFeatures = topojson.feature(this.countries, this.countries.objects.countries);  
+        this.mapFeatures = topojson.feature(this.countries, this.countries.objects.countries);
+        console.log(this.mapFeatures);  
         this.svg = d3.select<SVGElement, unknown>('.svgMapContainer');         
+        
         },
       complete: () => {
-/*        this.zoom = d3.zoom<SVGSVGElement, unknown>()
+        this.zoom = d3.zoom<SVGSVGElement, unknown>()
               .scaleExtent([1, 8])
               .on('zoom', this.zoomed.bind(this)); 
-        this.svg.call(this.zoom);      */
+        this.svg.call(this.zoom);      
       }      
     });
   }
   zoomed(){
     this.transform = d3.event.transform;
-    console.log(d3.event)
   }
 
   reset() {
@@ -82,7 +109,7 @@ export class MapComponent implements OnInit {
     this.svg.transition()
     .duration(750)
     // .call( zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1) ); // not in d3 v4
-    .call( this.zoom.transform, d3.zoomIdentity ); // updated for d3 v4
+    .call( this.zoom.transform, d3.zoomIdentity ); // updated for d3 v4  */
   }
 
   clicked(feature: any, event:any) {
@@ -113,14 +140,39 @@ export class MapComponent implements OnInit {
     event.stopPropagation();
   }
 
-
+/*
   mousedown(event: any) {
     this.draggable = true;
+    event.stopImmediatePropagation();
     console.log("mousedown");
     console.log(event.view);
     this.xStart = event.clientX;
     this.yStart = event.clientY;
   }
+
+  translateTo(timestamp: any){
+    if (this.start === -1){
+      this.start = timestamp
+    }
+
+    let elapsed = timestamp - this.start;
+
+    if(this.previousTimestamp !== timestamp){
+      const xTransform = (this.transformDest.x - this.xOffset) / 750;
+      const yTransform = (this.transformDest.y - this.yOffset) / 750;
+      this.transform = 'translate(' + (this.xOffset + elapsed*xTransform) + ', ' + (this.yOffset + elapsed*yTransform) + ')';
+    }
+    if(elapsed < 750) {
+      console.log(elapsed);
+      requestAnimationFrame(this.translateTo.bind(this))
+    }
+    else{
+      this.start = -1
+      this.previousTimestamp = -1
+      this.xOffset = 0;
+      this.yOffset = 0;
+    }
+}
 
   mousemove(event: any) {
     if (this.draggable) {
@@ -131,10 +183,6 @@ export class MapComponent implements OnInit {
       this.yStart = event.clientY;
       this.transform = 'translate(' + this.xOffset.toString() + ', ' + this.yOffset.toString() + ')';
     }
-  }
+  } */
 
-  mouseup(event: any) {
-    this.draggable = false;
-    console.log("mouseup");
-  }
 }
