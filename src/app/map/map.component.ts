@@ -1,7 +1,9 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import * as d3 from 'd3';
+import { Subscription } from 'rxjs';
 import * as topojson from 'topojson-client';
 import { HeaderService } from '../header/header.service';
+import { MapDataService } from '../shared/map-data/map-data.service';
 import { MapService } from './map.service';
 
 @Component({
@@ -9,9 +11,10 @@ import { MapService } from './map.service';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, OnDestroy {
+  private clickListenerSub!: Subscription;
   scaleFactor: number = 200;
-  activeCountry = '';
+  activeCountry: string = '';
   //these will stay as any until I find the right typescript types that allow this code to work
   svg!: d3.Selection<SVGElement, unknown, HTMLElement, any>;
   path!: d3.GeoPath<any, d3.GeoPermissibleObjects>;
@@ -22,7 +25,8 @@ export class MapComponent implements OnInit {
   private countries: any;
   scrHeight: number = 0;
   scrWidth: number = 0;
-  svgDimensions: Record<string, string> = {}
+  svgDimensions: Record<string, string> = {};
+  
 /*
   xStart: number = 0;
   xOffset: number = 0;
@@ -35,7 +39,7 @@ export class MapComponent implements OnInit {
   transformDest: any = {};
   */
 
-  constructor(private mapService: MapService, private headerService: HeaderService) { 
+  constructor(private mapService: MapService, private headerService: HeaderService, private mapDataService: MapDataService) { 
     this.getScreenSize();
   }
 
@@ -79,7 +83,12 @@ export class MapComponent implements OnInit {
 
   ngOnInit(): void {
     this.setSVGDimensions();
-    this.mapService.getMap().subscribe({
+    this.clickListenerSub = this.mapService.getClickListener().subscribe({
+      next: feature => {
+        this.clicked(feature as d3.GeoPermissibleObjects, null);
+      }
+    });
+    this.mapDataService.getMap().subscribe({
       next: data => {
         this.countries = data;
         this.mesh = topojson.mesh(this.countries, this.countries.objects.countries, function(a, b) { return a !== b; });
@@ -88,11 +97,10 @@ export class MapComponent implements OnInit {
         this.path = d3.geoPath().projection(projection);
 
         this.mapFeatures = topojson.feature(this.countries, this.countries.objects.countries);
-        console.log(this.mapFeatures);  
-        this.svg = d3.select<SVGElement, unknown>('.svgMapContainer');         
         
         },
-      complete: () => {
+      complete: () => {  
+        this.svg = d3.select<SVGElement, unknown>('.svgMapContainer'); 
         this.zoom = d3.zoom<SVGSVGElement, unknown>()
               .scaleExtent([1, 8])
               .on('zoom', this.zoomed.bind(this)); 
@@ -106,6 +114,7 @@ export class MapComponent implements OnInit {
 
   reset() {
     this.activeCountry = ''
+    this.headerService.updateNavSearchListener('');
     this.svg.transition()
     .duration(750)
     // .call( zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1) ); // not in d3 v4
@@ -113,7 +122,7 @@ export class MapComponent implements OnInit {
   }
 
   clicked(feature: any, event:any) {
-    event.stopPropagation();
+    if (event) event.stopPropagation();
     if (this.activeCountry == feature.properties.name) { 
       this.reset(); 
       return 
@@ -127,9 +136,7 @@ export class MapComponent implements OnInit {
     y = (bounds[0][1] + bounds[1][1]) / 2,
     scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / this.scrWidth, dy / this.scrHeight))),
     translate = [this.scrWidth / 2 - scale * x, this.scrHeight / 2 - scale * y];
-
-    console.log(bounds);
-
+    
     this.svg.transition()
         .duration(750)
         // .call(zoom.translate(translate).scale(scale).event); // not in d3 v4
@@ -138,6 +145,10 @@ export class MapComponent implements OnInit {
   
   meshClick(event: any){
     event.stopPropagation();
+  }
+
+  ngOnDestroy() {
+    this.clickListenerSub.unsubscribe();
   }
 
 /*

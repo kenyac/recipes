@@ -1,8 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { MapService } from '../map/map.service';
 
-import { environment } from 'src/environments/environment';
+import { MapDataService } from '../shared/map-data/map-data.service';
+import { MapFeaturesModel } from '../shared/map-data/models/map-features.model';
 import { HeaderService } from './header.service';
 
 @Component({
@@ -12,12 +14,14 @@ import { HeaderService } from './header.service';
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   form: FormGroup;
-  options = environment.countryArr;
-  filteredOptions: string[] = [];
+  mapFeatures: MapFeaturesModel[] = [];
+  filteredOptions: MapFeaturesModel[] = [];
   displayDropdown = false;
   private navSearchSub!: Subscription;
 
-  constructor(private headerService: HeaderService) { 
+  constructor(private headerService: HeaderService, 
+              private mapDataService: MapDataService,
+              private mapService: MapService) { 
     this.form = new FormGroup({
     'countryName': new FormControl(null, {
       validators: [Validators.required]
@@ -25,6 +29,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   });}
 
   ngOnInit() {
+    this.mapDataService.getMapFeatures().subscribe({
+      next: data => {
+        this.mapFeatures = data;
+      }
+    });
     this.form.valueChanges.subscribe(value => {
       if (value.countryName !== '' && value.countryName !== undefined){
         this.displayDropdown = true;
@@ -47,13 +56,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   performFilter(filterBy: string) {
     filterBy = filterBy.toLocaleLowerCase();
-    return this.options.filter((option: string) =>
-      option.toLocaleLowerCase().includes(filterBy));
+    return this.mapFeatures.filter((feature: MapFeaturesModel) =>
+      feature.properties.name.toLocaleLowerCase().includes(filterBy));
   }
 
-  selectCountry(event: any) {
+  selectCountry(feature: MapFeaturesModel, event: any) {
     this.form.controls.countryName.setValue(event.originalTarget.innerHTML);
-    document.getElementById(event.originalTarget.innerHTML)?.dispatchEvent(new Event('click'));
+    this.mapService.updateClickListener(feature);
   }
 
   ngOnDestroy() {

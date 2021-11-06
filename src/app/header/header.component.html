@@ -6,9 +6,10 @@
             placeholder="Enter a Country"
             (blur)="hideDropdown()"
             formControlName='countryName'>
+            <button type="submit" style="display: none;"></button>
             <div class="autocomplete-listbox" *ngIf="displayDropdown && filteredOptions.length">
                 <ul class="dropdown-menu dropdown-menu-dark">
-                    <li *ngFor="let option of filteredOptions"><a class="dropdown-item" (mousedown)="selectCountry($event)">{{option}}</a></li>
+                    <li *ngFor="let feature of filteredOptions"><a class="dropdown-item" (mousedown)="selectCountry(feature, $event)">{{feature.properties.name}}</a></li>
                 </ul> 
             </div>
         </form>        

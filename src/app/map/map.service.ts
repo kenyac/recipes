@@ -1,17 +1,20 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http'
-import { Observable } from 'rxjs';
+import { Subject } from 'rxjs';
+import { MapFeaturesModel } from '../shared/map-data/models/map-features.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MapService {
-  private mapUrl = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
-  constructor(private http: HttpClient){
+  private clickListener = new Subject<MapFeaturesModel>();
+  constructor(){ }
+  
+  updateClickListener(feature: MapFeaturesModel) {
+    this.clickListener.next(feature);
+  }
 
-    }
-    getMap(): Observable<any> {
-        return this.http.get<any>(this.mapUrl);
-    }
+  getClickListener() {
+    return this.clickListener.asObservable();
+  }
 
 }
