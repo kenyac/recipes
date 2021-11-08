@@ -8,12 +8,14 @@ import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
 import { MapComponent } from './map/map.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { RecipesComponent } from './recipes/recipes.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
-    MapComponent
+    MapComponent,
+    RecipesComponent
   ],
   imports: [
     BrowserModule,
