@@ -41,6 +41,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       if (value.countryName !== '' && value.countryName !== undefined && !this.arrowKeyPressed){
         this.displayDropdown = true;
         this.activeFilteredOption = -1;
+        this.tempInput = '';
         this.filteredOptions = this.performFilter(value.countryName);
       } 
       else if(this.arrowKeyPressed){
@@ -89,8 +90,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   decrementOption() {
     if(this.activeFilteredOption === -1){
       this.tempInput = this.form.value.countryName;
-      this.activeFilteredOption = this.filteredOptions.length -1;
-      this.form.controls.countryName.setValue(this.filteredOptions[this.activeFilteredOption].properties.name);
+      if(this.filteredOptions.length > 0){
+        this.activeFilteredOption = this.filteredOptions.length -1;
+        this.form.controls.countryName.setValue(this.filteredOptions[this.activeFilteredOption].properties.name);
+      }
     }
     else if (this.activeFilteredOption === 0){
       this.activeFilteredOption = -1
@@ -103,8 +106,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   incrementOption() {
+    if (this.activeFilteredOption === -1) this.tempInput = this.form.value.countryName;
     if (this.activeFilteredOption + 1 < this.filteredOptions.length){
-      if (this.activeFilteredOption === -1) this.tempInput = this.form.value.countryName;
       this.activeFilteredOption += 1;
       this.form.controls.countryName.setValue(this.filteredOptions[this.activeFilteredOption].properties.name);
     }
@@ -117,12 +120,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   keydown(event: any) {
     if (event.key === 'ArrowUp'){
       this.arrowKeyPressed = true;
-      this.decrementOption();
+      if(this.form.value.countryName !== '') this.decrementOption();
       event.preventDefault();
     }
     else if (event.key=== 'ArrowDown'){
       this.arrowKeyPressed = true;
-      this.incrementOption();
+      if(this.form.value.countryName !== '') this.incrementOption();
       event.preventDefault();
     }
     else {
