@@ -17,6 +17,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   mapFeatures: MapFeaturesModel[] = [];
   filteredOptions: MapFeaturesModel[] = [];
   displayDropdown = false;
+  activeFilteredOption = -1;
+  tempInput = '';
+  arrowKeyPressed: boolean = false;
   private navSearchSub!: Subscription;
 
   constructor(private headerService: HeaderService, 
@@ -35,10 +38,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
       }
     });
     this.form.valueChanges.subscribe(value => {
-      if (value.countryName !== '' && value.countryName !== undefined){
+      if (value.countryName !== '' && value.countryName !== undefined && !this.arrowKeyPressed){
         this.displayDropdown = true;
+        this.activeFilteredOption = -1;
         this.filteredOptions = this.performFilter(value.countryName);
-      } else {
+      } 
+      else if(this.arrowKeyPressed){
+        this.displayDropdown = true;
+      }
+      else {
         this.hideDropdown();
       }
     });
@@ -61,8 +69,65 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   selectCountry(feature: MapFeaturesModel, event: any) {
+    if (event.button === 2) return;
     this.form.controls.countryName.setValue(event.originalTarget.innerHTML);
     this.mapService.updateClickListener(feature);
+  }
+
+  onSubmit() {
+    let submittedCountry: MapFeaturesModel = this.mapFeatures.filter((feature: MapFeaturesModel) =>
+    feature.properties.name.toLocaleLowerCase() === this.form.value.countryName.toLocaleLowerCase())[0];
+    if(submittedCountry) {
+      this.mapService.updateClickListener(submittedCountry);
+    }
+    else {
+      console.log('na');
+      this.form.controls.countryName.setValue('');
+    }
+  }
+
+  decrementOption() {
+    if(this.activeFilteredOption === -1){
+      this.tempInput = this.form.value.countryName;
+      this.activeFilteredOption = this.filteredOptions.length -1;
+      this.form.controls.countryName.setValue(this.filteredOptions[this.activeFilteredOption].properties.name);
+    }
+    else if (this.activeFilteredOption === 0){
+      this.activeFilteredOption = -1
+      this.form.controls.countryName.setValue(this.tempInput);
+    }
+    else {
+      this.activeFilteredOption -= 1;
+      this.form.controls.countryName.setValue(this.filteredOptions[this.activeFilteredOption].properties.name);
+    }
+  }
+
+  incrementOption() {
+    if (this.activeFilteredOption + 1 < this.filteredOptions.length){
+      if (this.activeFilteredOption === -1) this.tempInput = this.form.value.countryName;
+      this.activeFilteredOption += 1;
+      this.form.controls.countryName.setValue(this.filteredOptions[this.activeFilteredOption].properties.name);
+    }
+    else {
+      this.activeFilteredOption = -1
+      this.form.controls.countryName.setValue(this.tempInput);
+    };
+  }
+
+  keydown(event: any) {
+    if (event.key === 'ArrowUp'){
+      this.arrowKeyPressed = true;
+      this.decrementOption();
+      event.preventDefault();
+    }
+    else if (event.key=== 'ArrowDown'){
+      this.arrowKeyPressed = true;
+      this.incrementOption();
+      event.preventDefault();
+    }
+    else {
+      this.arrowKeyPressed = false;
+    }
   }
 
   ngOnDestroy() {

@@ -1,15 +1,22 @@
 <nav class="navbar navbar-dark bg-dark">
     <div class="container-sm">
-        <form [formGroup]="form">
+        <form [formGroup]="form" (submit)="onSubmit()">
             <input class="form-control"
             type="text"
             placeholder="Enter a Country"
             (blur)="hideDropdown()"
+            (keydown)="keydown($event)"
             formControlName='countryName'>
             <button type="submit" style="display: none;"></button>
             <div class="autocomplete-listbox" *ngIf="displayDropdown && filteredOptions.length">
                 <ul class="dropdown-menu dropdown-menu-dark">
-                    <li *ngFor="let feature of filteredOptions"><a class="dropdown-item" (mousedown)="selectCountry(feature, $event)">{{feature.properties.name}}</a></li>
+                    <li *ngFor="let feature of filteredOptions; index as i">
+                        <a class="dropdown-item"
+                           (mousedown)="selectCountry(feature, $event)" 
+                           [ngClass]="i === activeFilteredOption ? 'dropdown-active' : ''">
+                            {{feature.properties.name}}
+                        </a>
+                    </li>
                 </ul> 
             </div>
         </form>        
