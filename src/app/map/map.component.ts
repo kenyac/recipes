@@ -7,6 +7,10 @@ import { RecipesService } from '../recipes/recipes.service';
 import { MapDataService } from '../shared/map-data/map-data.service';
 import { MapService } from './map.service';
 
+//in the html file you should attach the click handler to the parent and determine where to zoom from the click target
+//having that many click listeners is inefficient
+
+
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
@@ -126,10 +130,10 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   clicked(feature: any, event:any) {
-    console.log(event);
     if (event) event.stopPropagation();
     if (this.activeCountry == feature.properties.name) { 
       if (!event) return;
+      this.recipeService.updateContainerTrigger('closed');
       this.reset(); 
       return 
     }
