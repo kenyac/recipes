@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import { Subscription } from 'rxjs';
 import * as topojson from 'topojson-client';
 import { HeaderService } from '../header/header.service';
+import { RecipesService } from '../recipes/recipes.service';
 import { MapDataService } from '../shared/map-data/map-data.service';
 import { MapService } from './map.service';
 
@@ -39,7 +40,10 @@ export class MapComponent implements OnInit, OnDestroy {
   transformDest: any = {};
   */
 
-  constructor(private mapService: MapService, private headerService: HeaderService, private mapDataService: MapDataService) { 
+  constructor(private mapService: MapService, 
+              private headerService: HeaderService, 
+              private mapDataService: MapDataService,
+              private recipeService: RecipesService) { 
     this.getScreenSize();
   }
 
@@ -122,8 +126,10 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   clicked(feature: any, event:any) {
+    console.log(event);
     if (event) event.stopPropagation();
     if (this.activeCountry == feature.properties.name) { 
+      if (!event) return;
       this.reset(); 
       return 
     }
@@ -140,7 +146,10 @@ export class MapComponent implements OnInit, OnDestroy {
     this.svg.transition()
         .duration(750)
         // .call(zoom.translate(translate).scale(scale).event); // not in d3 v4
-        .call( this.zoom.transform as any, d3.zoomIdentity.translate(translate[0],translate[1]).scale(scale) );
+        .call( this.zoom.transform as any, d3.zoomIdentity.translate(translate[0],translate[1]).scale(scale) )
+        .on('end', () => {
+          this.recipeService.updateContainerTrigger('open');
+        });
   }
   
   meshClick(event: any){
