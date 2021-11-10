@@ -133,7 +133,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (event) event.stopPropagation();
     if (this.activeCountry == feature.properties.name) { 
       if (!event) return;
-      this.recipeService.updateContainerTrigger('closed');
+      this.recipeService.updateContainerStatus(false);
       this.reset(); 
       return 
     }
@@ -152,7 +152,8 @@ export class MapComponent implements OnInit, OnDestroy {
         // .call(zoom.translate(translate).scale(scale).event); // not in d3 v4
         .call( this.zoom.transform as any, d3.zoomIdentity.translate(translate[0],translate[1]).scale(scale) )
         .on('end', () => {
-          this.recipeService.updateContainerTrigger('open');
+          //make request to json for recipes
+          this.recipeService.updateContainerStatus(true);
         });
   }
   

@@ -7,7 +7,7 @@ import {
   transition
 } from '@angular/animations';
 import { RecipesService } from './recipes.service';
-import { fromEvent, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-recipes',
@@ -15,43 +15,39 @@ import { fromEvent, Subscription } from 'rxjs';
   styleUrls: ['./recipes.component.css'],
   animations: [
     trigger('displayContainer', [
-      state('closed', style({
-        marginTop: '0px'
-      })),
-      state('open', style({
-        marginTop: 'calc(-100vh + 54px)'
-      })),
-      transition('closed <=> open',[
-        animate('750ms ease-in-out')
+      transition(':enter',[
+        style({marginTop: '0px'}),
+        animate('750ms ease-in-out', style({
+          marginTop: 'calc(-100vh + 54px)'}))
       ]),
+      transition(':leave',[
+        animate('750ms ease-in-out', style({marginTop: '0px'}))
+      ])
     ])
   ]
 })
-export class RecipesComponent implements OnInit, OnDestroy {
-  @ViewChild('recipeContainer')
-  recipeContainer!: ElementRef;
+export class RecipesComponent implements OnInit, OnDestroy {  
+  displayRecipes: boolean = false;
+  private recipeContainerSub!: Subscription;
 
-  containerTrigger: string = "closed";
-  containerSub!: Subscription;
-
-  constructor(private recipeService: RecipesService,
-              private renderer: Renderer2) { }
+  constructor(private recipeService: RecipesService) { }
 
   ngOnInit(): void {
-    this.containerSub = this.recipeService.getContainerTrigger().subscribe(
-      state => {
-        this.containerTrigger = state;
+    this.recipeContainerSub = this.recipeService.getContainerStatus().subscribe({
+      next: data => {
+        this.displayRecipes = data;
+        console.log(this.displayRecipes);
       }
-    );
+    })
   }
 
   closeContainer(event: MouseEvent) {
     event.stopPropagation();
-    this.containerTrigger = 'closed';
+    this.displayRecipes = false;
   }
 
   ngOnDestroy() {
-    this.containerSub.unsubscribe();
+    this.recipeContainerSub.unsubscribe();
   }
 
 

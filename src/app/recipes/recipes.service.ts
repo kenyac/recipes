@@ -5,15 +5,19 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class RecipesService {
-  containerTrigger = new Subject<string>();
+  containerStatus = new Subject<boolean>();
 
   constructor() { }
 
-  updateContainerTrigger(state: string) {
-    this.containerTrigger.next(state);
+  updateContainerStatus(state: boolean) {
+    this.containerStatus.next(state);
   }
 
-  getContainerTrigger() {
-    return this.containerTrigger.asObservable();
+  getContainerStatus() {
+    return this.containerStatus.asObservable();
+  }
+
+  getRecipes(countryName: string) {
+
   }
 }
