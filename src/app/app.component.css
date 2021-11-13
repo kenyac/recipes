@@ -1,0 +1,13 @@
+.gutter{
+    --bs-gutter-x: 1.5rem;
+}
+
+@media only screen and (min-width: 1200px) {
+    .col-12 {
+        padding: 0;
+    }
+
+    .no-gutter {
+        --bs-gutter-x: 0;
+    }
+} 
