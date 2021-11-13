@@ -1,1 +1,6 @@
-<p>recipe-list works!</p>
+<div class="card" (click)="click()" style="cursor: pointer;">
+    <img [src]="recipe.recipe_image" class="card-img-top">
+    <div class="card-body">
+        <p class="fs-5" style="margin: 0;">{{recipe.recipe_name}}</p>
+    </div>
+</div>

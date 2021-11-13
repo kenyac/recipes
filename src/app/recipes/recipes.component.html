@@ -1,11 +1,17 @@
-<div @displayContainer *ngIf="displayRecipes" class="recipe-container">
+<div [@displayContainer]="state" *ngIf="displayRecipes || visible" class="recipe-container"  style="overflow: scroll;">
     <div class="container-fluid">
-        <div class="row justify-content-end">
+        <div class="row justify-content-end"  *ngIf="!visible">
             <div class="col-4 text-end">
                 <button type="button" 
                         class="btn-close btn-close-white me-0" 
                         (click)="closeContainer($event)"
                         aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <app-recipe-list  class="col-6 mt-4" *ngFor="let recipe of recipeList"
+                                [recipe]="recipe"></app-recipe-list>
             </div>
         </div>
     </div>

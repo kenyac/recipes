@@ -8,6 +8,7 @@ import {
 } from '@angular/animations';
 import { RecipesService } from './recipes.service';
 import { Subscription } from 'rxjs';
+import { RecipeModel } from './recipes.model';
 
 @Component({
   selector: 'app-recipes',
@@ -15,19 +16,33 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./recipes.component.css'],
   animations: [
     trigger('displayContainer', [
-      transition(':enter',[
-        style({marginTop: '0px'}),
+      state('open', style({
+        marginTop: '0'
+      })),
+      state('closed', style({
+        marginTop: '100vh'
+      })),
+      state('visible', style({
+        position: 'static'
+      })),
+      transition('* => open',[
+        style({marginTop: '100vh'}),
         animate('750ms ease-in-out', style({
-          marginTop: 'calc(-100vh + 54px)'}))
+          marginTop: '0'}))
       ]),
-      transition(':leave',[
-        animate('750ms ease-in-out', style({marginTop: '0px'}))
-      ])
+      transition('open => *',[
+        style({marginTop: '0'}),
+        animate('750ms ease-in-out', style({
+          marginTop: '100vh'}))
+      ]),
     ])
   ]
 })
 export class RecipesComponent implements OnInit, OnDestroy {  
   displayRecipes: boolean = false;
+  visible = false;
+  state: string = '';
+  recipeList!: RecipeModel[];
   private recipeContainerSub!: Subscription;
 
   constructor(private recipeService: RecipesService) { }
@@ -35,14 +50,24 @@ export class RecipesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.recipeContainerSub = this.recipeService.getContainerStatus().subscribe({
       next: data => {
-        this.displayRecipes = data;
-        console.log(this.displayRecipes);
+        this.displayRecipes = data.state;
+        this.recipeList = data.recipes;
+        if(!this.visible) this.state = this.displayRecipes ? 'open' : 'closed';
+        console.log(this.displayRecipes, this.recipeList);
       }
     })
+    if(window.innerWidth >= 1200) {
+      this.visible = true;
+      this.state = 'visible'
+    }
+    else {
+      this.state = 'closed';
+    }
   }
 
   closeContainer(event: MouseEvent) {
     event.stopPropagation();
+    this.state = 'closed';
     this.displayRecipes = false;
   }
 

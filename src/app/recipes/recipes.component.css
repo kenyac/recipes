@@ -1,7 +1,7 @@
 .recipe-container {
-    height: calc(100% - 54px);
+    height: 100%;
     width: 100%;
     background-color: #1F2833;
     position: absolute;
-    margin-top: calc(-100vh + 54px);
+    margin-top: 0;
 }

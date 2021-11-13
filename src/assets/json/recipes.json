@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Japan",
+        "recipes": [
+            {
+                "recipe_name": "Tonkatsu",
+                "recipe_image": "../../assets/images/tonkatsu.jpg",
+                "recipe_link": "https://www.justonecookbook.com/tonkatsu/"
+            },
+            {
+                "recipe_name": "Gyoza",
+                "recipe_image": "../../assets/images/gyoza.jpg",
+                "recipe_link": "https://www.seriouseats.com/the-best-japanese-pork-and-cabbage-dumplings-gyoza-recipe"
+            }
+        ]
+    },
+    {
+        "name": "Canada",
+        "recipes": [
+            {
+                "recipe_name": "Tonkatsu",
+                "recipe_image": "../../assets/images/tonkatsu.jpg",
+                "recipe_link": "https://www.justonecookbook.com/tonkatsu/"
+            },
+            {
+                "recipe_name": "Gyoza",
+                "recipe_image": "../../assets/images/gyoza.jpg",
+                "recipe_link": "https://www.seriouseats.com/the-best-japanese-pork-and-cabbage-dumplings-gyoza-recipe"
+            }
+        ]
+    }
+]

@@ -68,6 +68,10 @@ export class MapComponent implements OnInit, OnDestroy {
     else if(window.innerWidth <= 900){
       this.scaleFactor = 130;
     }
+
+    if(window.innerWidth >= 1200) {
+      this.scrWidth = (window.innerWidth * 3) / 4;
+    }
   }
 
   /*
@@ -133,7 +137,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (event) event.stopPropagation();
     if (this.activeCountry == feature.properties.name) { 
       if (!event) return;
-      this.recipeService.updateContainerStatus(false);
+      this.recipeService.updateContainerStatus(false, '');
       this.reset(); 
       return 
     }
@@ -153,7 +157,7 @@ export class MapComponent implements OnInit, OnDestroy {
         .call( this.zoom.transform as any, d3.zoomIdentity.translate(translate[0],translate[1]).scale(scale) )
         .on('end', () => {
           //make request to json for recipes
-          this.recipeService.updateContainerStatus(true);
+          this.recipeService.updateContainerStatus(true, this.activeCountry);
         });
   }
   
