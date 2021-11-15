@@ -134,6 +134,9 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   clicked(feature: any, event:any) {
+    //check to see if on mobile resolution and pull up window is already open
+
+    
     if (event) event.stopPropagation();
     if (this.activeCountry == feature.properties.name) { 
       if (!event) return;
