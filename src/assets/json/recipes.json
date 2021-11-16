@@ -18,14 +18,19 @@
         "name": "Canada",
         "recipes": [
             {
-                "recipe_name": "Tonkatsu",
-                "recipe_image": "../../assets/images/tonkatsu.jpg",
-                "recipe_link": "https://www.justonecookbook.com/tonkatsu/"
-            },
+                "recipe_name": "Poutine",
+                "recipe_image": "../../assets/images/poutine.jpg",
+                "recipe_link": "https://www.seasonsandsuppers.ca/authentic-canadian-poutine-recipe/"
+            }
+        ]
+    },
+    {
+        "name": "China",
+        "recipes": [
             {
-                "recipe_name": "Gyoza",
-                "recipe_image": "../../assets/images/gyoza.jpg",
-                "recipe_link": "https://www.seriouseats.com/the-best-japanese-pork-and-cabbage-dumplings-gyoza-recipe"
+                "recipe_name": "Mapo Tofu",
+                "recipe_image": "../../assets/images/mapo_tofu.jpg",
+                "recipe_link": "https://www.reddit.com/r/Cooking/comments/bkwppx/recipe_sichuan_mapo_tofu_revisited_%E9%BA%BB%E5%A9%86%E8%B1%86%E8%85%90/"
             }
         ]
     }

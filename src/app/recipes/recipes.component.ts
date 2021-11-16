@@ -5,7 +5,7 @@ import {
   style,
   animate,
   transition
-} from '@angular/animations';
+} from '@angular/animations'; 
 import { RecipesService } from './recipes.service';
 import { Subscription } from 'rxjs';
 import { RecipeModel } from './recipes.model';
