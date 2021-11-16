@@ -14,7 +14,6 @@ export class RecipeListComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChange) {
-    console.log(this.recipe.recipe_name);
   }
 
   click() {

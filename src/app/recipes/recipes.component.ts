@@ -53,7 +53,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.displayRecipes = data.state;
         this.recipeList = data.recipes;
         if(!this.visible) this.state = this.displayRecipes ? 'open' : 'closed';
-        console.log(this.displayRecipes, this.recipeList);
       }
     })
     if(window.innerWidth >= 1200) {
